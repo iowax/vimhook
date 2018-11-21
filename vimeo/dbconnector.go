@@ -1,6 +1,8 @@
 package vimeo
 
 import (
+	"fmt"
+
 	mgo "gopkg.in/mgo.v2"
 )
 
@@ -15,9 +17,10 @@ func NewDBConnector(url string) (*DBConnector, error) {
 	session, err := mgo.Dial(url)
 
 	if err != nil {
-		return &DBConnector{session: session, usedDB: defaultDatabase}, nil
+		return nil, err
 	}
-	return nil, err
+	fmt.Println("connected successfully")
+	return &DBConnector{session: session, usedDB: defaultDatabase}, nil
 }
 
 func (c DBConnector) setUsedDB(name string) {
@@ -29,7 +32,7 @@ func (c DBConnector) Insert(collection string, docs ...interface{}) (bool, error
 	col := c.session.DB(c.usedDB).C(collection)
 	err := col.Insert(docs)
 	if err != nil {
-		return true, nil
+		return false, err
 	}
-	return false, err
+	return true, nil
 }
